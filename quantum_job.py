@@ -29,7 +29,7 @@ pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
 isa_circuit = pm.run(qc)
 
 # 🔹 Ouvrir une session pour exécuter le job
-with Session(service=service, backend=backend) as session:
+with Session(backend=backend) as session:
     # 🔹 Construire l'estimateur avec la session
     estimator = Estimator(session=session)
 
