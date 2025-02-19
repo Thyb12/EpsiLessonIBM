@@ -1,8 +1,9 @@
 import os
-from qiskit_ibm_runtime import QiskitRuntimeService, Estimator
+from qiskit_ibm_runtime import QiskitRuntimeService, Estimator, Session
 from qiskit import QuantumCircuit
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit.quantum_info import SparsePauliOp
+import os
 
 # 🔹 Vérifier que la clé API est bien définie
 TOKEN = os.getenv("IBM_QUANTUM_API_KEY")
@@ -27,18 +28,26 @@ qc.measure([0, 1], [0, 1])
 pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
 isa_circuit = pm.run(qc)
 
-# 🔹 Construire l'estimateur
-estimator = Estimator()
-estimator.options.resilience_level = 1
-estimator.options.default_shots = 5000
+# 🔹 Ouvrir une session pour exécuter le job
+with Session(service=service, backend=backend) as session:
+    # 🔹 Construire l'estimateur avec la session
+    estimator = Estimator(session=session)
 
-# 🔹 Mapper les observables
-observables_labels = ["ZZ", "XX", "YY"]
-observables = [SparsePauliOp(label) for label in observables_labels]
-mapped_observables = [obs.apply_layout(isa_circuit.layout) for obs in observables]
+    # 🔹 Définir les options d'exécution
+    estimator.options.resilience_level = 1
+    estimator.options.default_shots = 5000
 
-# 🔹 Exécuter le job
-job = estimator.run([(isa_circuit, mapped_observables)])
+    # 🔹 Mapper les observables
+    observables_labels = ["ZZ", "XX", "YY"]
+    observables = [SparsePauliOp(label) for label in observables_labels]
+    mapped_observables = [obs.apply_layout(isa_circuit.layout) for obs in observables]
 
-# 🔹 Afficher l'ID du job
-print(f">>> Job ID: {job.job_id()}")
+    # 🔹 Exécuter le job
+    job = estimator.run([(isa_circuit, mapped_observables)])
+
+    # 🔹 Afficher l'ID du job
+    print(f">>> Job ID: {job.job_id()}")
+
+    # 🔹 Attendre et afficher les résultats
+    result = job.result()
+    print("Résultats :", result)
