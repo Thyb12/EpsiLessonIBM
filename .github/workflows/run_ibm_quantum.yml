@@ -22,11 +22,16 @@ jobs:
         run: |
           pip install qiskit qiskit-ibm-runtime
 
-      - name: Set up IBM Quantum API Key
-        env:
-          IBM_QUANTUM_API_KEY: ${{ secrets.IBM_QUANTUM_API_KEY }}
+      - name: Debug IBM Quantum API Key
         run: |
-          python -c "from qiskit_ibm_runtime import QiskitRuntimeService; QiskitRuntimeService.save_account('${{ secrets.IBM_QUANTUM_API_KEY }}', overwrite=True, channel='ibm_quantum')"
+          if [ -z "${{ secrets.IBM_QUANTUM_API_KEY }}" ]; then
+            echo "Erreur : IBM_QUANTUM_API_KEY n'est pas défini dans les Secrets GitHub."
+            exit 1
+          else
+            echo "IBM_QUANTUM_API_KEY est bien défini (caché pour la sécurité)."
+          fi
 
       - name: Run IBM Quantum Job
+        env:
+          IBM_QUANTUM_API_KEY: ${{ secrets.IBM_QUANTUM_API_KEY }}
         run: python quantum_job.py
