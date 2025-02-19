@@ -1,7 +1,7 @@
 from qiskit_ibm_runtime import QiskitRuntimeService, Estimator
 from qiskit import QuantumCircuit
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
-from qiskit.opflow import SparsePauliOp
+from qiskit.quantum_info import SparsePauliOp
 import os
 
 # 🔹 Authentifier le service avec la clé API depuis les variables d'environnement
