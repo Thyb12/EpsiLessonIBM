@@ -1,0 +1,32 @@
+name: Run IBM Quantum Job
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-quantum-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install qiskit qiskit-ibm-runtime
+
+      - name: Set up IBM Quantum API Key
+        env:
+          IBM_QUANTUM_API_KEY: ${{ secrets.IBM_QUANTUM_API_KEY }}
+        run: |
+          python -c "from qiskit_ibm_runtime import QiskitRuntimeService; QiskitRuntimeService.save_account('${{ secrets.IBM_QUANTUM_API_KEY }}', overwrite=True, channel='ibm_quantum')"
+
+      - name: Run IBM Quantum Job
+        run: python quantum_job.py
