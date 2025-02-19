@@ -3,7 +3,6 @@ from qiskit_ibm_runtime import QiskitRuntimeService, Estimator, Session
 from qiskit import QuantumCircuit
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit.quantum_info import SparsePauliOp
-import os
 
 # 🔹 Vérifier que la clé API est bien définie
 TOKEN = os.getenv("IBM_QUANTUM_API_KEY")
@@ -29,9 +28,9 @@ pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
 isa_circuit = pm.run(qc)
 
 # 🔹 Ouvrir une session pour exécuter le job
-with Session(backend=backend) as session:
+with Session(backend=backend) as session:  # ✅ Correction ici
     # 🔹 Construire l'estimateur avec la session
-    estimator = Estimator(session=session)
+    estimator = Estimator()
 
     # 🔹 Définir les options d'exécution
     estimator.options.resilience_level = 1
